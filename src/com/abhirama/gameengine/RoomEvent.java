@@ -1,16 +1,16 @@
 package com.abhirama.gameengine;
 
+import com.abhirama.gameengine.test.Data;
+
+import java.util.Map;
+
 /**
  * Created by IntelliJ IDEA.
  * User: abhat
  * Date: 8/1/12
- * Time: 4:19 PM
+ * Time: 7:19 PM
  * To change this template use File | Settings | File Templates.
  */
-public abstract class Player {
-  private int id;
-
-  public Player(int id) {
-    this.id = id;
-  }
+public interface RoomEvent {
+  public Map execute(Data data, Room room);
 }

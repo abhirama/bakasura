@@ -2,9 +2,6 @@ package com.abhirama.gameengine.test;
 
 import com.abhirama.gameengine.Room;
 
-import java.util.LinkedList;
-import java.util.List;
-
 /**
  * Created by IntelliJ IDEA.
  * User: abhat
@@ -23,17 +20,13 @@ public class Game {
     room.addPlayer(testPlayer1);
 
     HitEvent hitEvent = new HitEvent();
+    HitRoomEvent hitRoomEvent = new HitRoomEvent();
 
-    List<Integer> targetIds = new LinkedList<Integer>();
-    targetIds.add(1);
-    hitEvent.setTargetPlayerIds(targetIds);
-    hitEvent.setOriginatorId(0);
+    room.setRoomEvent(hitRoomEvent);
 
-    hitEvent.setTargetPlayerIds(targetIds);
-
-    room.apply(hitEvent);
+    room.executeRoomEvent(hitEvent);
 
     System.out.println("Player 0 health:" + testPlayer0.getHealth());
-    System.out.println("Player 1 health:" + testPlayer0.getHealth());
+    System.out.println("Player 1 health:" + testPlayer1.getHealth());
   }
 }

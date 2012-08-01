@@ -1,5 +1,7 @@
 package com.abhirama.gameengine;
 
+import com.abhirama.gameengine.test.Data;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +24,8 @@ public class Room {
   
   private int id;
 
+  private RoomEvent roomEvent;
+
   private Room() {
   }
   
@@ -41,10 +45,8 @@ public class Room {
     this.players.add(player);
   }
 
-  public void apply(Event event) {
-    for (Player player : this.players) {
-      player.apply(event);
-    }
+  public void executeRoomEvent(Data data) {
+    this.getRoomEvent().execute(data, this);
   }
 
   public int getId() {
@@ -53,5 +55,21 @@ public class Room {
 
   public void setId(int id) {
     this.id = id;
+  }
+
+  public RoomEvent getRoomEvent() {
+    return roomEvent;
+  }
+
+  public void setRoomEvent(RoomEvent roomEvent) {
+    this.roomEvent = roomEvent;
+  }
+
+  public List<Player> getPlayers() {
+    return players;
+  }
+
+  public void setPlayers(List<Player> players) {
+    this.players = players;
   }
 }
