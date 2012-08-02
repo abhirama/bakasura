@@ -1,8 +1,6 @@
 /**
  * Created by IntelliJ IDEA.
  * User: abhat
- * Date: 8/1/12
- * Time: 6:20 PM
  * This software is provided under the "DO WHAT THE HECK YOU WANT TO DO WITH THIS LICENSE"
  */
 package com.abhirama.gameengine.stresstest;

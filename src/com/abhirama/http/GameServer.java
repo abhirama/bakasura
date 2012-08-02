@@ -13,6 +13,12 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
+
+/**
+ * Created by IntelliJ IDEA.
+ * User: abhat
+ * This software is provided under the "DO WHAT THE HECK YOU WANT TO DO WITH THIS LICENSE"
+ */
 package com.abhirama.http;
 
 import com.abhirama.gameengine.stresstest.Game;

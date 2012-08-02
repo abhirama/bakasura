@@ -1,12 +1,10 @@
-package com.abhirama.utils;
-
 /**
  * Created by IntelliJ IDEA.
  * User: abhat
- * Date: 8/2/12
- * Time: 2:33 PM
- * To change this template use File | Settings | File Templates.
+ * This software is provided under the "DO WHAT THE HECK YOU WANT TO DO WITH THIS LICENSE"
  */
+package com.abhirama.utils;
+
 public class Util {
   public static int getRandomInt(int min, int max) {
     return min + (int)(Math.random() * ((max - min) + 1));

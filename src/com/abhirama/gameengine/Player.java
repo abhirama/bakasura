@@ -1,12 +1,10 @@
-package com.abhirama.gameengine;
-
 /**
  * Created by IntelliJ IDEA.
  * User: abhat
- * Date: 8/1/12
- * Time: 4:19 PM
- * To change this template use File | Settings | File Templates.
+ * This software is provided under the "DO WHAT THE HECK YOU WANT TO DO WITH THIS LICENSE"
  */
+package com.abhirama.gameengine;
+
 public abstract class Player {
   private int id;
 

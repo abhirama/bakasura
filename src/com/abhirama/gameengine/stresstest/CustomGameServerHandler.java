@@ -1,3 +1,8 @@
+/**
+ * Created by IntelliJ IDEA.
+ * User: abhat
+ * This software is provided under the "DO WHAT THE HECK YOU WANT TO DO WITH THIS LICENSE"
+ */
 package com.abhirama.gameengine.stresstest;
 
 import com.abhirama.gameengine.Room;
@@ -6,13 +11,6 @@ import com.abhirama.utils.Util;
 
 import java.util.Map;
 
-/**
- * Created by IntelliJ IDEA.
- * User: abhat
- * Date: 8/2/12
- * Time: 5:19 PM
- * To change this template use File | Settings | File Templates.
- */
 public class CustomGameServerHandler extends GameServerHandler {
 
   @Override

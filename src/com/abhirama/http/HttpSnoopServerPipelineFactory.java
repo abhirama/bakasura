@@ -1,4 +1,5 @@
 /*
+
  * Copyright 2012 The Netty Project
  *
  * The Netty Project licenses this file to you under the Apache License,
@@ -12,6 +13,12 @@
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  * License for the specific language governing permissions and limitations
  * under the License.
+ */
+
+/**
+ * Created by IntelliJ IDEA.
+ * User: abhat
+ * This software is provided under the "DO WHAT THE HECK YOU WANT TO DO WITH THIS LICENSE"
  */
 package com.abhirama.http;
 
