@@ -3,7 +3,7 @@
  * User: abhat
  * To change this template use File | Settings | File Templates.
  */
-package com.abhirama.gameengine.stresstest;
+package com.abhirama.gameengine.tests.stresstest;
 
 import java.util.HashMap;
 import java.util.Map;

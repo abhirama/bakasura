@@ -5,7 +5,7 @@
  */
 package com.abhirama.gameengine;
 
-import com.abhirama.gameengine.stresstest.Data;
+import com.abhirama.gameengine.tests.stresstest.Data;
 
 import java.util.Map;
 
