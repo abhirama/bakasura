@@ -5,8 +5,6 @@
  */
 package com.abhirama.gameengine;
 
-import com.abhirama.gameengine.tests.stresstest.Data;
-
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -22,8 +20,6 @@ public class Room {
   private List<Player> players = new LinkedList<Player>();
   
   private int id;
-
-  private RoomEvent roomEvent;
 
   private Room() {
   }
@@ -44,24 +40,12 @@ public class Room {
     this.players.add(player);
   }
 
-  public void executeRoomEvent(Data data) {
-    this.getRoomEvent().execute(data, this);
-  }
-
   public int getId() {
     return id;
   }
 
   public void setId(int id) {
     this.id = id;
-  }
-
-  public RoomEvent getRoomEvent() {
-    return roomEvent;
-  }
-
-  public void setRoomEvent(RoomEvent roomEvent) {
-    this.roomEvent = roomEvent;
   }
 
   public List<Player> getPlayers() {

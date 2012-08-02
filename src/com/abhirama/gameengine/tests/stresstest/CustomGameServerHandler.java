@@ -5,10 +5,12 @@
  */
 package com.abhirama.gameengine.tests.stresstest;
 
+import com.abhirama.gameengine.Player;
 import com.abhirama.gameengine.Room;
 import com.abhirama.http.GameServerHandler;
 import com.abhirama.utils.Util;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -24,12 +26,14 @@ public class CustomGameServerHandler extends GameServerHandler {
     }
     Room room = Room.getRoom(Util.getRandomInt(1, 1000));
 
-    HitEvent hitEvent = new HitEvent();
-    HitRoomEvent hitRoomEvent = new HitRoomEvent();
+    System.out.println("Executing hit room event:" + room.getPlayers().size());
+    List<Player> players = room.getPlayers();
 
-    room.setRoomEvent(hitRoomEvent);
+    TestPlayer player0 = (TestPlayer)players.get(Util.getRandomInt(0, 9));
+    TestPlayer player1 = (TestPlayer)players.get(Util.getRandomInt(0, 9));
 
-    room.executeRoomEvent(hitEvent);
+    player1.setHealth(90);
+
     //Simulate a memcache fetch
     try {
       TimeUnit.MILLISECONDS.sleep(2);
