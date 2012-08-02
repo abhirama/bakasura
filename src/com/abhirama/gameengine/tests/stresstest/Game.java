@@ -6,6 +6,7 @@
 package com.abhirama.gameengine.tests.stresstest;
 
 import com.abhirama.gameengine.Room;
+import com.abhirama.gameengine.tests.TestPlayer;
 import com.abhirama.http.GameServer;
 
 import java.util.ArrayList;

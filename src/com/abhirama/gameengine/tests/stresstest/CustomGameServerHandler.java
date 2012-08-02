@@ -7,6 +7,7 @@ package com.abhirama.gameengine.tests.stresstest;
 
 import com.abhirama.gameengine.Player;
 import com.abhirama.gameengine.Room;
+import com.abhirama.gameengine.tests.TestPlayer;
 import com.abhirama.http.GameServerHandler;
 import com.abhirama.utils.Util;
 

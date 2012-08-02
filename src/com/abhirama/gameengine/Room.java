@@ -55,4 +55,8 @@ public class Room {
   public void setPlayers(List<Player> players) {
     this.players = players;
   }
+
+  public String toString() {
+    return String.format("Room{Id - %d}", this.id);
+  }
 }

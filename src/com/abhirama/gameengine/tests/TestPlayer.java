@@ -3,7 +3,7 @@
  * User: abhat
  * This software is provided under the "DO WHAT THE HECK YOU WANT TO DO WITH THIS LICENSE"
  */
-package com.abhirama.gameengine.tests.stresstest;
+package com.abhirama.gameengine.tests;
 
 import com.abhirama.gameengine.Player;
 
@@ -20,5 +20,9 @@ public class TestPlayer extends Player {
 
   public void setHealth(int health) {
     this.health = health;
+  }
+
+  public String toString() {
+    return String.format("Player{Id - %d, Health - %d", this.getId(), this.getHealth());
   }
 }
