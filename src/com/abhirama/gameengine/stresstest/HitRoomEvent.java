@@ -1,4 +1,4 @@
-package com.abhirama.gameengine.test;
+package com.abhirama.gameengine.stresstest;
 
 import com.abhirama.gameengine.Player;
 import com.abhirama.gameengine.Room;

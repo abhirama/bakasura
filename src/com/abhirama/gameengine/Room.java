@@ -1,6 +1,6 @@
 package com.abhirama.gameengine;
 
-import com.abhirama.gameengine.test.Data;
+import com.abhirama.gameengine.stresstest.Data;
 
 import java.util.LinkedList;
 import java.util.List;

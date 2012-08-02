@@ -1,4 +1,4 @@
-package com.abhirama.gameengine.test;
+package com.abhirama.gameengine.stresstest;
 
 import java.util.Map;
 

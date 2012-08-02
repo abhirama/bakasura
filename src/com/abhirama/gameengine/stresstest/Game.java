@@ -5,7 +5,7 @@
  * Time: 6:20 PM
  * This software is provided under the "DO WHAT THE HECK YOU WANT TO DO WITH THIS LICENSE"
  */
-package com.abhirama.gameengine.test;
+package com.abhirama.gameengine.stresstest;
 
 import com.abhirama.gameengine.Room;
 import com.abhirama.http.GameServer;

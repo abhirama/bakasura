@@ -1,4 +1,4 @@
-package com.abhirama.gameengine.test;
+package com.abhirama.gameengine.stresstest;
 
 import com.abhirama.gameengine.Room;
 import com.abhirama.http.GameServerHandler;
@@ -26,7 +26,7 @@ public class CustomGameServerHandler extends GameServerHandler {
 
     room.executeRoomEvent(hitEvent);
 
-    this.addToOp("I am inside custom game server handler");
+    this.addToOp("I am inside custom game server handler" + this.requestParameters.toString());
 
     return null;
   }
