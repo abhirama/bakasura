@@ -34,7 +34,7 @@ public class CustomGameServerHandler extends GameServerHandler {
 
     player1.setHealth(90);
 
-    //Simulate a memcache fetch
+    //Simulate a memcache set
     try {
       TimeUnit.MILLISECONDS.sleep(2);
     } catch (InterruptedException e) {
