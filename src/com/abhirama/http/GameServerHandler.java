@@ -20,16 +20,15 @@ import static org.jboss.netty.handler.codec.http.HttpHeaders.Names.*;
 import static org.jboss.netty.handler.codec.http.HttpResponseStatus.*;
 import static org.jboss.netty.handler.codec.http.HttpVersion.*;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import com.abhirama.gameengine.Room;
 import com.abhirama.gameengine.test.HitEvent;
 import com.abhirama.gameengine.test.HitRoomEvent;
 import com.abhirama.utils.Util;
+import com.sun.org.apache.xpath.internal.axes.HasPositionalPredChecker;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.ChannelFuture;
@@ -50,87 +49,95 @@ import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.jboss.netty.util.CharsetUtil;
 
-public class HttpSnoopServerHandler extends SimpleChannelUpstreamHandler {
-  public HttpSnoopServerHandler() {
-    System.out.println("Creating a new handler");
-  }
-
+public abstract class GameServerHandler extends SimpleChannelUpstreamHandler {
+  public static final String REQUEST_INFO_PROTOCOL_VERSION = "protocolVersion";
+  public static final String REQUEST_INFO_HOSTNAME = "hostname";
+  public static final String REQUEST_INFO_REQUEST_URI = "requestURI";
+  
   private HttpRequest request;
   private boolean readingChunks;
   /** Buffer that stores the response content */
   private final StringBuilder buf = new StringBuilder();
+  
+  private Set<Cookie> requestCookies = new HashSet<Cookie>();
+  private Map<String, String> requestHeaders = new HashMap<String, String>();
+  private Map<String, String> requestInfo = new HashMap<String, String>();
+  private Map<String, List<String>> requestParameters = new HashMap<String, List<String>>();
+  private String requestContent = "";
 
-  @Override
-  public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
-    if (!readingChunks) {
-      HttpRequest request = this.request = (HttpRequest) e.getMessage();
-
-      if (is100ContinueExpected(request)) {
-        send100Continue(e);
-      }
-
-      buf.setLength(0);
-      buf.append("WELCOME TO THE WILD WILD WEB SERVER\r\n");
-      buf.append("===================================\r\n");
-
-      buf.append("VERSION: " + request.getProtocolVersion() + "\r\n");
-      buf.append("HOSTNAME: " + getHost(request, "unknown") + "\r\n");
-      buf.append("REQUEST_URI: " + request.getUri() + "\r\n\r\n");
-
-      for (Map.Entry<String, String> h: request.getHeaders()) {
-        buf.append("HEADER: " + h.getKey() + " = " + h.getValue() + "\r\n");
-      }
-      buf.append("\r\n");
-
-      QueryStringDecoder queryStringDecoder = new QueryStringDecoder(request.getUri());
-      Map<String, List<String>> params = queryStringDecoder.getParameters();
-      if (!params.isEmpty()) {
-        for (Entry<String, List<String>> p: params.entrySet()) {
-          String key = p.getKey();
-          List<String> vals = p.getValue();
-          for (String val : vals) {
-            buf.append("PARAM: " + key + " = " + val + "\r\n");
-          }
-        }
-        buf.append("\r\n");
-      }
-
-      if (request.isChunked()) {
-        readingChunks = true;
-      } else {
-        ChannelBuffer content = request.getContent();
-        if (content.readable()) {
-          buf.append("CONTENT: " + content.toString(CharsetUtil.UTF_8) + "\r\n");
-        }
-        writeResponse(e);
-      }
-    } else {
-      HttpChunk chunk = (HttpChunk) e.getMessage();
-      if (chunk.isLast()) {
-        readingChunks = false;
-        buf.append("END OF CONTENT\r\n");
-
-        HttpChunkTrailer trailer = (HttpChunkTrailer) chunk;
-        if (!trailer.getHeaderNames().isEmpty()) {
-          buf.append("\r\n");
-          for (String name: trailer.getHeaderNames()) {
-            for (String value: trailer.getHeaders(name)) {
-              buf.append("TRAILING HEADER: " + name + " = " + value + "\r\n");
-            }
-          }
-          buf.append("\r\n");
-        }
-
-        writeResponse(e);
-      } else {
-        buf.append("CHUNK: " + chunk.getContent().toString(CharsetUtil.UTF_8) + "\r\n");
+  private Set<Cookie> responseCookies = new HashSet<Cookie>();
+  private Map<String, String> responseHeaders = new HashMap<String, String>();
+  
+  private void populateRequestInfo() {
+    this.requestInfo.put(REQUEST_INFO_HOSTNAME, getHost(request, "unknown"));
+    //todo - use string formatting
+    this.requestInfo.put(REQUEST_INFO_PROTOCOL_VERSION, request.getProtocolVersion().getMajorVersion() + "." + request.getProtocolVersion().getMinorVersion());
+    this.requestInfo.put(REQUEST_INFO_REQUEST_URI,  request.getUri());
+  }
+  
+  private void populateRequestHeaders() {
+    for (Map.Entry<String, String> h: request.getHeaders()) {
+      this.requestHeaders.put(h.getKey(), h.getValue());
+    }
+  }
+  
+  private void populateRequestCookies() {
+    String cookieString = request.getHeader(COOKIE);
+    if (cookieString != null) {
+      CookieDecoder cookieDecoder = new CookieDecoder();
+      Set<Cookie> cookies = cookieDecoder.decode(cookieString);
+      this.requestCookies = cookies;
+    }
+  }
+  
+  private void populateRequestParameters() {
+    QueryStringDecoder queryStringDecoder = new QueryStringDecoder(request.getUri());
+    Map<String, List<String>> params = queryStringDecoder.getParameters();
+    if (!params.isEmpty()) {
+      for (Entry<String, List<String>> p: params.entrySet()) {
+        String key = p.getKey();
+        List<String> vals = p.getValue();
+        this.requestParameters.put(key, vals);
       }
     }
   }
 
+  protected void setResponseCookies(Set<Cookie> responseCookies) {
+    this.responseCookies = responseCookies;
+  }
+  
+  protected void setResponseHeaders(Map<String, String> responseHeaders) {
+    this.responseHeaders = responseHeaders;  
+  }
+  
+  //todo change this later
+  protected void addToOp(String string) {
+    this.buf.append(string);
+  }
+
+  @Override
+  public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
+    HttpRequest request = this.request = (HttpRequest) e.getMessage();
+    
+    this.populateRequestInfo();
+    this.populateRequestHeaders();
+    this.populateRequestCookies();
+    this.populateRequestParameters();
+
+    ChannelBuffer content = request.getContent();
+    if (content.readable()) {
+      this.requestContent = content.toString(CharsetUtil.UTF_8);
+    }
+
+    this.gameLogic(null);
+
+    this.writeResponse(e);
+  }
+  
+  public abstract Map gameLogic(Map data);
+
   private void writeResponse(MessageEvent e) throws InterruptedException {
     TimeUnit.MILLISECONDS.sleep(2);
-    gameLogic();
     TimeUnit.MILLISECONDS.sleep(2);
 
     // Decide whether to close the connection or not.
@@ -195,17 +202,6 @@ public class HttpSnoopServerHandler extends SimpleChannelUpstreamHandler {
       throws Exception {
     e.getCause().printStackTrace();
     e.getChannel().close();
-  }
-  
-  public void gameLogic() {
-    Room room = Room.getRoom(Util.getRandomInt(1, 1000));
-
-    HitEvent hitEvent = new HitEvent();
-    HitRoomEvent hitRoomEvent = new HitRoomEvent();
-
-    room.setRoomEvent(hitRoomEvent);
-
-    room.executeRoomEvent(hitEvent);
   }
 }
 

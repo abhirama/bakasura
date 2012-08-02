@@ -17,6 +17,7 @@ package com.abhirama.http;
 
 import static org.jboss.netty.channel.Channels.*;
 
+import org.jboss.netty.channel.ChannelHandler;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.handler.codec.http.HttpContentCompressor;
@@ -24,6 +25,12 @@ import org.jboss.netty.handler.codec.http.HttpRequestDecoder;
 import org.jboss.netty.handler.codec.http.HttpResponseEncoder;
 
 public class HttpSnoopServerPipelineFactory implements ChannelPipelineFactory {
+  private Class customGameServerHandler;
+
+  public HttpSnoopServerPipelineFactory(Class customGameServerHandler) {
+    this.customGameServerHandler = customGameServerHandler;
+  }
+
   public ChannelPipeline getPipeline() throws Exception {
     // Create a default pipeline implementation.
     ChannelPipeline pipeline = pipeline();
@@ -39,7 +46,7 @@ public class HttpSnoopServerPipelineFactory implements ChannelPipelineFactory {
     pipeline.addLast("encoder", new HttpResponseEncoder());
     // Remove the following line if you don't want automatic content compression.
     pipeline.addLast("deflater", new HttpContentCompressor());
-    pipeline.addLast("handler", new HttpSnoopServerHandler());
+    pipeline.addLast("handler", (ChannelHandler)customGameServerHandler.newInstance());
     return pipeline;
   }
 }

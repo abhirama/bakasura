@@ -3,6 +3,7 @@ package com.abhirama.gameengine.test;
 import com.abhirama.gameengine.Player;
 import com.abhirama.gameengine.Room;
 import com.abhirama.gameengine.RoomEvent;
+import com.abhirama.utils.Util;
 
 import java.util.HashMap;
 import java.util.List;
@@ -18,11 +19,11 @@ import java.util.Map;
 public class HitRoomEvent implements RoomEvent {
   @Override
   public Map execute(Data data, Room room) {
-    System.out.println("Executing hit room event");
+    System.out.println("Executing hit room event:" + room.getPlayers().size());
     List<Player> players = room.getPlayers();
 
-    TestPlayer player0 = (TestPlayer)players.get(0);
-    TestPlayer player1 = (TestPlayer)players.get(1);
+    TestPlayer player0 = (TestPlayer)players.get(Util.getRandomInt(0, 9));
+    TestPlayer player1 = (TestPlayer)players.get(Util.getRandomInt(0, 9));
 
     player1.setHealth(90);
 

@@ -18,6 +18,7 @@ package com.abhirama.http;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 
+import com.abhirama.gameengine.test.CustomGameServerHandler;
 import com.abhirama.gameengine.test.Game;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
@@ -26,11 +27,11 @@ import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
  * An HTTP server that sends back the content of the received HTTP request
  * in a pretty plaintext form.
  */
-public class HttpSnoopServer {
+public class GameServer {
 
   private final int port;
 
-  public HttpSnoopServer(int port) {
+  public GameServer(int port) {
     this.port = port;
   }
 
@@ -44,7 +45,7 @@ public class HttpSnoopServer {
             Executors.newCachedThreadPool()));
 
     // Set up the event pipeline factory.
-    bootstrap.setPipelineFactory(new HttpSnoopServerPipelineFactory());
+    bootstrap.setPipelineFactory(new HttpSnoopServerPipelineFactory(CustomGameServerHandler.class));
     //bootstrap.setOption("child.tcpNoDelay", true);
     //bootstrap.setOption("child.keepAlive", true);
 
@@ -59,7 +60,7 @@ public class HttpSnoopServer {
     } else {
       port = 8080;
     }
-    new HttpSnoopServer(port).run();
+    new GameServer(port).run();
   }
 
 }

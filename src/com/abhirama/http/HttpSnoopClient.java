@@ -32,7 +32,7 @@ import org.jboss.netty.handler.codec.http.HttpVersion;
 
 /**
  * A simple HTTP client that prints out the content of the HTTP response to
- * {@link System#out} to test {@link HttpSnoopServer}.
+ * {@link System#out} to test {@link GameServer}.
  */
 public class HttpSnoopClient {
 
