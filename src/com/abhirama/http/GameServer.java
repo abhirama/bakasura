@@ -15,13 +15,12 @@
  */
 package com.abhirama.http;
 
-import java.net.InetSocketAddress;
-import java.util.concurrent.Executors;
-
-import com.abhirama.gameengine.test.CustomGameServerHandler;
 import com.abhirama.gameengine.test.Game;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
+
+import java.net.InetSocketAddress;
+import java.util.concurrent.Executors;
 
 /**
  * An HTTP server that sends back the content of the received HTTP request
@@ -30,9 +29,11 @@ import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 public class GameServer {
 
   private final int port;
+  private final Class gameServerHandler;
 
-  public GameServer(int port) {
+  public GameServer(int port, Class gameServerHandler) {
     this.port = port;
+    this.gameServerHandler = gameServerHandler;
   }
 
   public void run() {
@@ -45,23 +46,12 @@ public class GameServer {
             Executors.newCachedThreadPool()));
 
     // Set up the event pipeline factory.
-    bootstrap.setPipelineFactory(new HttpSnoopServerPipelineFactory(CustomGameServerHandler.class));
-    //bootstrap.setOption("child.tcpNoDelay", true);
-    //bootstrap.setOption("child.keepAlive", true);
+    bootstrap.setPipelineFactory(new HttpSnoopServerPipelineFactory(this.gameServerHandler));
+    bootstrap.setOption("child.tcpNoDelay", true);
+    bootstrap.setOption("child.keepAlive", true);
 
     // Bind and start to accept incoming connections.
-    bootstrap.bind(new InetSocketAddress(port));
+    bootstrap.bind(new InetSocketAddress(this.port));
   }
-
-  public static void main(String[] args) {
-    int port;
-    if (args.length > 0) {
-      port = Integer.parseInt(args[0]);
-    } else {
-      port = 8080;
-    }
-    new GameServer(port).run();
-  }
-
 }
 
