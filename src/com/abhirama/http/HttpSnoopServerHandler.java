@@ -24,7 +24,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
+import com.abhirama.gameengine.Room;
+import com.abhirama.gameengine.test.HitEvent;
+import com.abhirama.gameengine.test.HitRoomEvent;
+import com.abhirama.utils.Util;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.ChannelFuture;
@@ -46,6 +51,9 @@ import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.jboss.netty.util.CharsetUtil;
 
 public class HttpSnoopServerHandler extends SimpleChannelUpstreamHandler {
+  public HttpSnoopServerHandler() {
+    System.out.println("Creating a new handler");
+  }
 
   private HttpRequest request;
   private boolean readingChunks;
@@ -120,9 +128,18 @@ public class HttpSnoopServerHandler extends SimpleChannelUpstreamHandler {
     }
   }
 
-  private void writeResponse(MessageEvent e) {
+  private void writeResponse(MessageEvent e) throws InterruptedException {
+    TimeUnit.MILLISECONDS.sleep(2);
+    gameLogic();
+    TimeUnit.MILLISECONDS.sleep(2);
+
     // Decide whether to close the connection or not.
     boolean keepAlive = isKeepAlive(request);
+    keepAlive = false;
+
+    if (keepAlive) {
+      System.out.println("Keeping alive");
+    }
 
     // Build the response object.
     HttpResponse response = new DefaultHttpResponse(HTTP_1_1, OK);
@@ -178,6 +195,17 @@ public class HttpSnoopServerHandler extends SimpleChannelUpstreamHandler {
       throws Exception {
     e.getCause().printStackTrace();
     e.getChannel().close();
+  }
+  
+  public void gameLogic() {
+    Room room = Room.getRoom(Util.getRandomInt(1, 1000));
+
+    HitEvent hitEvent = new HitEvent();
+    HitRoomEvent hitRoomEvent = new HitRoomEvent();
+
+    room.setRoomEvent(hitRoomEvent);
+
+    room.executeRoomEvent(hitEvent);
   }
 }
 
