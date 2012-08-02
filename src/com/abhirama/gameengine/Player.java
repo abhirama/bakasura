@@ -11,4 +11,8 @@ public abstract class Player {
   public Player(int id) {
     this.id = id;
   }
+
+  public int getId() {
+    return id;
+  }
 }
