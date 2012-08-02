@@ -59,6 +59,16 @@ public abstract class GameServerHandler extends SimpleChannelUpstreamHandler {
   protected Set<Cookie> responseCookies = new HashSet<Cookie>();
   protected Map<String, String> responseHeaders = new HashMap<String, String>();
 
+  protected boolean keepAlive = true; //Keep alive by default
+
+  public boolean getKeepAlive() {
+    return keepAlive;
+  }
+
+  public void setKeepAlive(boolean keepAlive) {
+    this.keepAlive = keepAlive;
+  }
+
   private void addKeepAlive(HttpResponse response) {
     // Add 'Content-Length' header only for a keep-alive connection.
     response.setHeader(CONTENT_LENGTH, response.getContent().readableBytes());
@@ -170,7 +180,7 @@ public abstract class GameServerHandler extends SimpleChannelUpstreamHandler {
     //response.setHeader(CONTENT_TYPE, "text/plain; charset=UTF-8");
     this.addHeaders(response);
 
-    boolean keepAlive = isKeepAlive(request);
+    boolean keepAlive = this.getKeepAlive() && isKeepAlive(request); //todo take this out later
     if (keepAlive) {
       this.addKeepAlive(response);
     }
