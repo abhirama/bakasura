@@ -35,20 +35,22 @@ public abstract class GameServerHandler extends SimpleChannelUpstreamHandler {
   public static final String REQUEST_INFO_PROTOCOL_VERSION = "protocolVersion";
   public static final String REQUEST_INFO_HOSTNAME = "hostname";
   public static final String REQUEST_INFO_REQUEST_URI = "requestURI";
-  
-  private HttpRequest request;
-  private boolean readingChunks;
-  /** Buffer that stores the response content */
-  private final StringBuilder buf = new StringBuilder();
-  
-  private Set<Cookie> requestCookies = new HashSet<Cookie>();
-  private Map<String, String> requestHeaders = new HashMap<String, String>();
-  private Map<String, String> requestInfo = new HashMap<String, String>();
-  private Map<String, List<String>> requestParameters = new HashMap<String, List<String>>();
-  private String requestContent = "";
 
-  private Set<Cookie> responseCookies = new HashSet<Cookie>();
-  private Map<String, String> responseHeaders = new HashMap<String, String>();
+  //todo - set the access modifiers appropriately
+
+  protected HttpRequest request;
+   protected boolean readingChunks;
+  /** Buffer that stores the response content */
+  protected final StringBuilder buf = new StringBuilder();
+  
+  protected Set<Cookie> requestCookies = new HashSet<Cookie>();
+  protected Map<String, String> requestHeaders = new HashMap<String, String>();
+  protected Map<String, String> requestInfo = new HashMap<String, String>();
+  protected Map<String, List<String>> requestParameters = new HashMap<String, List<String>>();
+  protected String requestContent = "";
+
+  protected Set<Cookie> responseCookies = new HashSet<Cookie>();
+  protected Map<String, String> responseHeaders = new HashMap<String, String>();
 
   private void addKeepAlive(HttpResponse response) {
     // Add 'Content-Length' header only for a keep-alive connection.
