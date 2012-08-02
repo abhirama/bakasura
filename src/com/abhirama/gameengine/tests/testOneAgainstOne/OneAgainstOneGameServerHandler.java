@@ -51,7 +51,6 @@ public class OneAgainstOneGameServerHandler extends GameServerHandler {
 
     //http://localhost:8080/?command=joinRoom&roomId=1001&playerId=2
     if (GameProtocol.isJoinRoomCommand(data)) {
-      System.out.println("Joining room");
       int roomId = GameProtocol.getRoomId(data);
       int playerId = GameProtocol.getPlayerId(data);
       
@@ -66,8 +65,6 @@ public class OneAgainstOneGameServerHandler extends GameServerHandler {
       map.put(GameProtocol.ROOM_ID, room.getId());
       map.put(GameProtocol.PLAYER_ID, testPlayer.getId());
       map.put("roomState", room.getPlayers());
-
-      System.out.println("Before returning");
 
       this.addToOp(map);
     }
