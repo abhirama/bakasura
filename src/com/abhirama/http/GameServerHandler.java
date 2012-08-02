@@ -23,7 +23,6 @@ import org.jboss.netty.util.CharsetUtil;
 
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.concurrent.TimeUnit;
 
 import static org.jboss.netty.handler.codec.http.HttpHeaders.Names.*;
 import static org.jboss.netty.handler.codec.http.HttpHeaders.getHost;
@@ -155,9 +154,6 @@ public abstract class GameServerHandler extends SimpleChannelUpstreamHandler {
   public abstract Map gameLogic(Map data);
 
   private void writeResponse(MessageEvent e) throws InterruptedException {
-    TimeUnit.MILLISECONDS.sleep(2);
-    TimeUnit.MILLISECONDS.sleep(2);
-
     // Build the response object.
     HttpResponse response = new DefaultHttpResponse(HTTP_1_1, OK);
     response.setContent(ChannelBuffers.copiedBuffer(this.buf.toString(), CharsetUtil.UTF_8));
