@@ -42,6 +42,8 @@ public class HttpSnoopServer {
 
     // Set up the event pipeline factory.
     bootstrap.setPipelineFactory(new HttpSnoopServerPipelineFactory());
+    bootstrap.setOption("child.tcpNoDelay", true);
+    bootstrap.setOption("child.keepAlive", true);
 
     // Bind and start to accept incoming connections.
     bootstrap.bind(new InetSocketAddress(port));
