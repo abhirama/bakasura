@@ -5,6 +5,8 @@ import com.abhirama.gameengine.tests.GameProtocol;
 import com.abhirama.gameengine.tests.PlayerStore;
 import com.abhirama.gameengine.tests.TestPlayer;
 import com.abhirama.http.GameServerHandler;
+import flexjson.JSONSerializer;
+
 import static org.jboss.netty.handler.codec.http.HttpHeaders.Names.*;
 
 import java.util.HashMap;
@@ -26,7 +28,7 @@ public class OneAgainstOneGameServerHandler extends GameServerHandler {
     this.setKeepAlive(false);
     
     Map<String, String> responseHeaders = new HashMap<String, String>();
-    responseHeaders.put(CONTENT_TYPE, "text/plain; charset=UTF-8");
+    responseHeaders.put(CONTENT_TYPE, "application/json");
 
     this.setResponseHeaders(responseHeaders);
     
@@ -39,11 +41,17 @@ public class OneAgainstOneGameServerHandler extends GameServerHandler {
       PlayerStore.add(playerId, testPlayer);
 
       room.addPlayer(testPlayer);
-      this.addToOp("Room " + room.getId() + " created by player " + testPlayer.getId());
+
+      Map map = new HashMap();
+      map.put(GameProtocol.ROOM_ID, room.getId());
+      map.put(GameProtocol.PLAYER_ID, testPlayer.getId());
+      
+      this.addToOp(map);
     }
 
     //http://localhost:8080/?command=joinRoom&roomId=1001&playerId=2
     if (GameProtocol.isJoinRoomCommand(data)) {
+      System.out.println("Joining room");
       int roomId = GameProtocol.getRoomId(data);
       int playerId = GameProtocol.getPlayerId(data);
       
@@ -53,7 +61,15 @@ public class OneAgainstOneGameServerHandler extends GameServerHandler {
 
       PlayerStore.add(playerId, testPlayer);
       room.addPlayer(testPlayer);
-      this.addToOp("Player " + playerId + " joined room " + room.getId() + ". Currently room has " + room.getPlayers().toString());
+
+      Map map = new HashMap();
+      map.put(GameProtocol.ROOM_ID, room.getId());
+      map.put(GameProtocol.PLAYER_ID, testPlayer.getId());
+      map.put("roomState", room.getPlayers());
+
+      System.out.println("Before returning");
+
+      this.addToOp(map);
     }
 
     //http://localhost:8080/?command=attack&roomId=1001&originatorId=1&targetIds=2
@@ -68,11 +84,32 @@ public class OneAgainstOneGameServerHandler extends GameServerHandler {
       TestPlayer target = ((TestPlayer) PlayerStore.get(targetId));
 
       target.setHealth(90);
+      
+      Map map = new HashMap();
 
-      this.addToOp(originator + " hit " + target + " in " + room);
+      Map map0 = new HashMap();
+      map0.put(GameProtocol.PLAYER_ID, originator.getId());
+      map0.put(GameProtocol.HEALTH, originator.getHealth());
+      
+      map.put(GameProtocol.ORIGINATOR_ID, map0);
+      
+      Map map1 = new HashMap();
+      map1.put(GameProtocol.PLAYER_ID, target.getId());
+      map1.put(GameProtocol.HEALTH, target.getHealth());
+      
+      map.put(GameProtocol.TARGET_IDS, map1);
+      map.put(GameProtocol.ROOM_ID, room.getId());
+
+      this.addToOp(map);
     }
 
     return null;
+  }
+  
+  private void addToOp(Map map) {
+    JSONSerializer serializer = new JSONSerializer();
+    String op = serializer.exclude("*.class").deepSerialize(map);
+    this.addToOp(op);
   }
 
 }
