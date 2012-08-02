@@ -23,6 +23,9 @@ public class GameProtocol {
   public static final String TARGET_IDS = "targetIds";
 
   public static final String HEALTH = "health";
+  
+  public static final String ORIGINATOR = "originator";
+  public static final String TARGET = "target";
 
   public static boolean isCreateRoomCommand(Map data) {
     return getCommand(data).equals(GameProtocol.CREATE_ROOM_COMMAND);

@@ -88,13 +88,13 @@ public class OneAgainstOneGameServerHandler extends GameServerHandler {
       map0.put(GameProtocol.PLAYER_ID, originator.getId());
       map0.put(GameProtocol.HEALTH, originator.getHealth());
       
-      map.put(GameProtocol.ORIGINATOR_ID, map0);
+      map.put(GameProtocol.ORIGINATOR, map0);
       
       Map map1 = new HashMap();
       map1.put(GameProtocol.PLAYER_ID, target.getId());
       map1.put(GameProtocol.HEALTH, target.getHealth());
       
-      map.put(GameProtocol.TARGET_IDS, map1);
+      map.put(GameProtocol.TARGET, map1);
       map.put(GameProtocol.ROOM_ID, room.getId());
 
       this.addToOp(map);
