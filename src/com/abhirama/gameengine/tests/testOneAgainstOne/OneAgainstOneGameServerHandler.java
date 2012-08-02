@@ -5,7 +5,9 @@ import com.abhirama.gameengine.tests.GameProtocol;
 import com.abhirama.gameengine.tests.PlayerStore;
 import com.abhirama.gameengine.tests.TestPlayer;
 import com.abhirama.http.GameServerHandler;
+import static org.jboss.netty.handler.codec.http.HttpHeaders.Names.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -22,8 +24,13 @@ public class OneAgainstOneGameServerHandler extends GameServerHandler {
     data = this.requestParameters;
 
     this.setKeepAlive(false);
+    
+    Map<String, String> responseHeaders = new HashMap<String, String>();
+    responseHeaders.put(CONTENT_TYPE, "text/plain; charset=UTF-8");
 
-    http://localhost:8080/?command=createRoom&playerId=1
+    this.setResponseHeaders(responseHeaders);
+    
+    //http://localhost:8080/?command=createRoom&playerId=1
     if (GameProtocol.isCreateRoomCommand(data)) {
       Room room = Room.createRoom();
       int playerId = GameProtocol.getPlayerId(data);
@@ -35,7 +42,7 @@ public class OneAgainstOneGameServerHandler extends GameServerHandler {
       this.addToOp("Room " + room.getId() + " created by player " + testPlayer.getId());
     }
 
-    http://localhost:8080/?command=joinRoom&roomId=1001&playerId=2
+    //http://localhost:8080/?command=joinRoom&roomId=1001&playerId=2
     if (GameProtocol.isJoinRoomCommand(data)) {
       int roomId = GameProtocol.getRoomId(data);
       int playerId = GameProtocol.getPlayerId(data);
@@ -49,7 +56,7 @@ public class OneAgainstOneGameServerHandler extends GameServerHandler {
       this.addToOp("Player " + playerId + " joined room " + room.getId() + ". Currently room has " + room.getPlayers().toString());
     }
 
-    http://localhost:8080/?command=attack&roomId=1001&originatorId=1&targetIds=2
+    //http://localhost:8080/?command=attack&roomId=1001&originatorId=1&targetIds=2
     if (GameProtocol.isAttackCommand(data)) {
       int roomId = GameProtocol.getRoomId(data);
       Room room = Room.getRoom(roomId);
