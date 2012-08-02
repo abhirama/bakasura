@@ -15,39 +15,22 @@
  */
 package com.abhirama.http;
 
-import static org.jboss.netty.handler.codec.http.HttpHeaders.*;
-import static org.jboss.netty.handler.codec.http.HttpHeaders.Names.*;
-import static org.jboss.netty.handler.codec.http.HttpResponseStatus.*;
-import static org.jboss.netty.handler.codec.http.HttpVersion.*;
+import org.jboss.netty.buffer.ChannelBuffer;
+import org.jboss.netty.buffer.ChannelBuffers;
+import org.jboss.netty.channel.*;
+import org.jboss.netty.handler.codec.http.*;
+import org.jboss.netty.util.CharsetUtil;
 
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
-import com.abhirama.gameengine.Room;
-import com.abhirama.gameengine.test.HitEvent;
-import com.abhirama.gameengine.test.HitRoomEvent;
-import com.abhirama.utils.Util;
-import com.sun.org.apache.xpath.internal.axes.HasPositionalPredChecker;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.channel.ChannelFutureListener;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ExceptionEvent;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
-import org.jboss.netty.handler.codec.http.Cookie;
-import org.jboss.netty.handler.codec.http.CookieDecoder;
-import org.jboss.netty.handler.codec.http.CookieEncoder;
-import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
-import org.jboss.netty.handler.codec.http.HttpChunk;
-import org.jboss.netty.handler.codec.http.HttpChunkTrailer;
-import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.jboss.netty.handler.codec.http.HttpRequest;
-import org.jboss.netty.handler.codec.http.HttpResponse;
-import org.jboss.netty.handler.codec.http.QueryStringDecoder;
-import org.jboss.netty.util.CharsetUtil;
+import static org.jboss.netty.handler.codec.http.HttpHeaders.Names.*;
+import static org.jboss.netty.handler.codec.http.HttpHeaders.getHost;
+import static org.jboss.netty.handler.codec.http.HttpHeaders.isKeepAlive;
+import static org.jboss.netty.handler.codec.http.HttpResponseStatus.CONTINUE;
+import static org.jboss.netty.handler.codec.http.HttpResponseStatus.OK;
+import static org.jboss.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 public abstract class GameServerHandler extends SimpleChannelUpstreamHandler {
   public static final String REQUEST_INFO_PROTOCOL_VERSION = "protocolVersion";
@@ -67,6 +50,22 @@ public abstract class GameServerHandler extends SimpleChannelUpstreamHandler {
 
   private Set<Cookie> responseCookies = new HashSet<Cookie>();
   private Map<String, String> responseHeaders = new HashMap<String, String>();
+
+  private void addKeepAlive(HttpResponse response) {
+    // Add 'Content-Length' header only for a keep-alive connection.
+    response.setHeader(CONTENT_LENGTH, response.getContent().readableBytes());
+    // Add keep alive header as per:
+    // - http://www.w3.org/Protocols/HTTP/1.1/draft-ietf-http-v11-spec-01.html#Connection
+    response.setHeader(CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
+
+    if (isKeepAlive(request)) {
+      // Add 'Content-Length' header only for a keep-alive connection.
+      response.setHeader(CONTENT_LENGTH, response.getContent().readableBytes());
+      // Add keep alive header as per:
+      // - http://www.w3.org/Protocols/HTTP/1.1/draft-ietf-http-v11-spec-01.html#Connection
+      response.setHeader(CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
+    }
+  }
   
   private void populateRequestInfo() {
     this.requestInfo.put(REQUEST_INFO_HOSTNAME, getHost(request, "unknown"));
@@ -114,6 +113,25 @@ public abstract class GameServerHandler extends SimpleChannelUpstreamHandler {
   protected void addToOp(String string) {
     this.buf.append(string);
   }
+  
+  protected void addCookies(HttpResponse response) {
+    if (this.responseCookies.size() > 0) {
+      for (Cookie responseCookie : this.responseCookies) {
+        //Todo check the right way to do this
+        CookieEncoder cookieEncoder = new CookieEncoder(true);
+        cookieEncoder.addCookie(responseCookie);
+        response.addHeader(SET_COOKIE, cookieEncoder.encode());
+      }
+    }
+  }
+  
+  protected void addHeaders(HttpResponse response) {
+    if (this.responseHeaders.size() > 0) {
+      for (Map.Entry<String, String> entry : this.responseHeaders.entrySet()) {
+        response.setHeader(entry.getKey(), entry.getValue());
+      }
+    }
+  }
 
   @Override
   public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
@@ -140,48 +158,20 @@ public abstract class GameServerHandler extends SimpleChannelUpstreamHandler {
     TimeUnit.MILLISECONDS.sleep(2);
     TimeUnit.MILLISECONDS.sleep(2);
 
-    // Decide whether to close the connection or not.
-    boolean keepAlive = isKeepAlive(request);
-    keepAlive = false;
-
-    if (keepAlive) {
-      System.out.println("Keeping alive");
-    }
-
     // Build the response object.
     HttpResponse response = new DefaultHttpResponse(HTTP_1_1, OK);
-    response.setContent(ChannelBuffers.copiedBuffer(buf.toString(), CharsetUtil.UTF_8));
-    response.setHeader(CONTENT_TYPE, "text/plain; charset=UTF-8");
+    response.setContent(ChannelBuffers.copiedBuffer(this.buf.toString(), CharsetUtil.UTF_8));
 
+    //response.setHeader(CONTENT_TYPE, "text/plain; charset=UTF-8");
+    this.addHeaders(response);
+
+    boolean keepAlive = isKeepAlive(request);
     if (keepAlive) {
-      // Add 'Content-Length' header only for a keep-alive connection.
-      response.setHeader(CONTENT_LENGTH, response.getContent().readableBytes());
-      // Add keep alive header as per:
-      // - http://www.w3.org/Protocols/HTTP/1.1/draft-ietf-http-v11-spec-01.html#Connection
-      response.setHeader(CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
+      this.addKeepAlive(response);
     }
 
-    // Encode the cookie.
-    String cookieString = request.getHeader(COOKIE);
-    if (cookieString != null) {
-      CookieDecoder cookieDecoder = new CookieDecoder();
-      Set<Cookie> cookies = cookieDecoder.decode(cookieString);
-      if (!cookies.isEmpty()) {
-        // Reset the cookies if necessary.
-        CookieEncoder cookieEncoder = new CookieEncoder(true);
-        for (Cookie cookie : cookies) {
-          cookieEncoder.addCookie(cookie);
-          response.addHeader(SET_COOKIE, cookieEncoder.encode());
-        }
-      }
-    } else {
-      // Browser sent no cookie.  Add some.
-      CookieEncoder cookieEncoder = new CookieEncoder(true);
-      cookieEncoder.addCookie("key1", "value1");
-      response.addHeader(SET_COOKIE, cookieEncoder.encode());
-      cookieEncoder.addCookie("key2", "value2");
-      response.addHeader(SET_COOKIE, cookieEncoder.encode());
-    }
+
+    this.addCookies(response);
 
     // Write the response.
     ChannelFuture future = e.getChannel().write(response);
