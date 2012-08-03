@@ -26,6 +26,17 @@ public class GameProtocol {
   
   public static final String ORIGINATOR = "originator";
   public static final String TARGET = "target";
+  
+  public static final String CALLBACK = "callback";
+  public static final String MESSAGE = "message";
+  
+  public static String getCallBack(Map<String, List<String>> data) {
+    return data.get(GameProtocol.CALLBACK).get(0);
+  }
+
+  public static String getMessage(Map<String, List<String>> data) {
+    return data.get(GameProtocol.MESSAGE).get(0);
+  }
 
   public static boolean isCreateRoomCommand(Map data) {
     return getCommand(data).equals(GameProtocol.CREATE_ROOM_COMMAND);
