@@ -8,14 +8,16 @@
         /* <![CDATA[ */
    google.load("jquery", "1.4.2");
 
-   function listen(last_modified, etag) {
+   function listen(/*last_modified, etag*/) {
        $.ajax({
+           /*
            'beforeSend': function(xhr) {
                xhr.setRequestHeader("If-None-Match", etag);
                xhr.setRequestHeader("If-Modified-Since", last_modified);
            },
-           url: '/cheetah/sub',
-           dataType: 'text',
+           */
+           url: 'http://localhost:8080',
+           dataType: 'jsonp',
            type: 'get',
            cache: 'false',
            success: function(data, textStatus, xhr) {
@@ -29,6 +31,7 @@
                $('#data').prepend(info);
 
                /* Start the next long poll. */
+               //listen(last_modified, etag);
                listen(last_modified, etag);
            },
            error: function(xhr, textStatus, errorThrown) {

@@ -30,12 +30,29 @@ public class GameProtocol {
   public static final String CALLBACK = "callback";
   public static final String MESSAGE = "message";
   
+  public static final String ACTION = "action";
+  
+  public static final String SEND_MESSAGE_ACTION = "sendMessage";
+  public static final String RECEIVE_MESSAGE_ACTION = "receiveMessage";
+
   public static String getCallBack(Map<String, List<String>> data) {
     return data.get(GameProtocol.CALLBACK).get(0);
   }
 
   public static String getMessage(Map<String, List<String>> data) {
     return data.get(GameProtocol.MESSAGE).get(0);
+  }
+
+  public static final boolean isSendMessage(Map<String, List<String>> data) {
+    return SEND_MESSAGE_ACTION.equals(getAction(data));
+  }
+
+  public static final boolean isReceiveMessage(Map<String, List<String>> data) {
+    return RECEIVE_MESSAGE_ACTION.equals(getAction(data));
+  }
+
+  public static String getAction(Map<String, List<String>> data) {
+    return data.get(GameProtocol.ACTION).get(0);
   }
 
   public static boolean isCreateRoomCommand(Map data) {

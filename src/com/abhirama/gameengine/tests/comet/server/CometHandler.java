@@ -16,8 +16,17 @@ public class CometHandler extends GameServerHandler {
   public Map gameLogic(Map data) {
     Map<String, List<String>> params = this.requestParameters;
 
-    System.out.println("Callback is:" + GameProtocol.getCallBack(params));
-    System.out.println("Message is:" + GameProtocol.getMessage(params));
+    if (GameProtocol.isSendMessage(params)) {
+      String message = GameProtocol.getMessage(params);
+
+      System.out.println("Callback is:" + GameProtocol.getCallBack(params));
+      System.out.println("Message is:" + GameProtocol.getMessage(params));
+
+      Game.messages.add(message);
+    } else {
+
+    }
+
 
     return null;
   }

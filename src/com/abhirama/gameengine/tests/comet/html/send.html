@@ -25,7 +25,8 @@
             $.ajax({
                 url: 'http://localhost:8080',
                 data: {
-                    "message": message
+                    "message": message,
+                    "action": "sendMessage"
                 },
                 dataType: 'jsonp',
                 type: 'get',
