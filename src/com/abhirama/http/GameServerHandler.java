@@ -131,6 +131,10 @@ public abstract class GameServerHandler extends SimpleChannelUpstreamHandler {
   protected void addToOp(String string) {
     this.buf.append(string);
   }
+
+  protected void clearOp() {
+    this.buf.delete(0, this.buf.length());
+  }
   
   protected void addCookies(HttpResponse response) {
     if (this.responseCookies.size() > 0) {

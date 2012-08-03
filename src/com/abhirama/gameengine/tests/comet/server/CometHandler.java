@@ -14,17 +14,15 @@ import java.util.Map;
 public class CometHandler extends GameServerHandler {
   @Override
   public Map gameLogic(Map data) {
-    this.setKeepAlive(false);
+    //this.setKeepAlive(false);
+    this.clearOp();
 
     Map<String, List<String>> params = this.requestParameters;
 
     if (GameProtocol.isSendMessage(params)) {
-      System.out.println("Got a send message");
       String message = GameProtocol.getMessage(params);
-
       Game.messages.add(message);
     } else {
-      System.out.println("Got a receive message");
       String callBack = GameProtocol.getCallBack(params);
       String op = String.format("%s('%s')", callBack, "");
       if (!Game.messages.isEmpty()) {
@@ -33,8 +31,6 @@ public class CometHandler extends GameServerHandler {
       }
       this.addToOp(op);
     }
-
-
     return null;
   }
 }
