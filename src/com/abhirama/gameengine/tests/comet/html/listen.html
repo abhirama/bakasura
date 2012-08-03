@@ -20,19 +20,27 @@
            dataType: 'jsonp',
            type: 'get',
            cache: 'false',
+           data: {
+               "action": "receiveMessage"
+           },
            success: function(data, textStatus, xhr) {
-               etag = xhr.getResponseHeader('Etag');
-               last_modified = xhr.getResponseHeader('Last-Modified');
+                if (data) {
+                    /*
+                   etag = xhr.getResponseHeader('Etag');
+                   last_modified = xhr.getResponseHeader('Last-Modified');
+                   */
 
-               div = $('<div class="msg">').text(data);
-               info = $('<div class="info">').text('Last-Modified: ' + last_modified + ' | Etag: ' + etag);
+                   div = $('<div class="msg">').text(data);
 
-               $('#data').prepend(div);
-               $('#data').prepend(info);
+                   //info = $('<div class="info">').text('Last-Modified: ' + last_modified + ' | Etag: ' + etag);
 
-               /* Start the next long poll. */
-               //listen(last_modified, etag);
-               listen(last_modified, etag);
+                   $('#data').prepend(div);
+                   //$('#data').prepend(info);
+
+                   /* Start the next long poll. */
+                   //listen(last_modified, etag);
+                }
+               listen(/*last_modified, etag*/);
            },
            error: function(xhr, textStatus, errorThrown) {
                $('#data').prepend(textStatus + ' | ' + errorThrown);
